@@ -1,5 +1,132 @@
 # C++ Notes
 
+##  Summery of Constructor
+
+### Default Constructor
+```cpp
+Base::Base(){}
+```
+
+### Parametrized Constructor
+```cpp
+Base::Base(const int& i){}
+```
+
+### Copy Constructor
+```cpp
+Base::Base(const Base& rhs){}
+
+Base Obj1;
+Base newObj = Obj1; //Creating a new object (newObj) and copying all data from Obj1 to newObj.
+```
+
+### Move Constructor
+- Used with `std::move(objectToBeMoved);`
+```cpp
+Base::Base(Base&& rhs) noexcept {}
+
+Base Obj1;
+Base newObj = std::move(Obj1); //Moving all data from Obj1 to newObj.
+//Obj will become hallow object after move is complete and should not used in further operation.
+```
+
+##  Summary operator overloading
+
+* ### Relational operator overloading
+    `>, < , = =, <=, >=`
+    * #### Comparison operator `==` overloading
+        ```cpp
+        bool operator=(const Base& rhs) const
+        {
+            //Some comparison code...
+            return (mData == rhs.mData);
+        }
+        
+        Base obj1;
+        Base obj2;
+        
+        if(obj1 == obj2)//If true objects have  same     data.
+        {}
+        ```
+
+* ### Assignment operators overloading
+    `=, +=,*=, /=,-=, %=`
+    * #### Assignment operator `=` overloading
+      ```cpp
+      Base obj1;
+      Base obj2;
+      
+      Base& operator=(const Base& rhs)
+      {
+          //Some copy code...
+          return *this;
+      }
+      obj2 = obj1 //Assign/Copy data from obj1 to obj2.
+
+      Base& operator+=(const Base& rhs)
+      {
+          mData = mData + rhs.mData;
+          return *this;
+      }
+      obj2 += obj1 //Add and assign data from obj1  to        obj2.
+      ```
+
+* ### Subscript operators `[]` overloading
+    ```cpp
+    int operator[] (bool) const { return 10;}
+
+    Base obj;
+    int i = obj[false];
+    ```
+* ### Function call  operators `()` overloading
+    ```cpp
+    bool operator() (int a) const { return (a == 10);}
+
+    Base obj;
+    bool i = obj(100);
+    ```
+
+* ### Arrow operators `->` overloading
+    ```cpp
+    Base* operator-> () const { return this;}
+    ```
+
+* ### `new` and `delete` operators overloading
+    ```cpp
+    void* operator new (size_t size){ return ::operator new(size); }
+    void* operator new[] (size_t size){ return ::operator new[](size); }
+
+    void operator delete(void* ptr) { ::operator delete(ptr); }
+    void operator delete[](void* ptr) { ::operator delete[](ptr); }
+    ```
+
+* ### Typecast operators overloading
+    ```cpp
+    operator bool() { return (mData != nullptr); }
+
+    Base obj;
+    bool b = (bool)obj;
+    bool b = static_cast<bool>obj;
+    ```
+* ### Pre/Post Increment operators overloading
+    ```cpp
+    Base operator++() 
+    { 
+        mData = mData + 1;
+        return Base(mData); 
+    } //Pre increment
+    Base operator++(int) 
+    {
+        Base b(mData);
+        mData = mData + 1;
+        return b; 
+    } //Post increment
+
+    Base obj;
+    ++obj;//Pre increment
+    obj++;//Post increment
+    ```
+
 ##  Summary of vptr and vtable in C++
 
 
