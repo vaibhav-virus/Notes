@@ -317,3 +317,134 @@ class D : public C, public B {};
          A( ) -> C( ) -> B( ) -> D( )
 - Destructor call sequence is reverse of Constructor call.
     ~D( ) -> ~B( ) -> ~C( ) -> ~A( )
+
+
+## STL(Standard Template Library)
+
+### Smart Pointer
+
+- Smart pointer are used the automate/manage the life cycle and allocated memory for heap allocated objects in C++. 
+- Smart pointer are just templatised class wrappers over the class whose life cycle is to be managed.
+
+* #### `std::unique_ptr<T>`
+    - Once a object is created on heap. The ownership/responsibility of that object can only be taken by a single owner at a time.
+    - Ownership of heap allocated object can be moved to another `std::unique_ptr<T>` object but cannot be copied.
+    ```cpp
+    std::unique_ptr<Base> uniqueOwner1 = std::make_unique<Base>(argumentForBaseConstructor); //std::make_unique() will create an object of typ Base on heap and then will return std::unique_ptr object as the sole owner of that object.
+    std::unique_ptr<Base> uniqueOwner2 = uniqueOwner1; //ERROR: Ownership cannot be copied or taken by multiple owner.
+    std::unique_ptr<Base> uniqueOwner2 = std::move(uniqueOwner1);//OK: ownership can be moved from  uniqueOwner1 to uniqueOwner2. Which leaves uniqueOwner1 in hallow state and should not be used further in code.
+    ```
+
+* #### `std::shared_ptr<T>`
+    - The ownership/responsibility of an heap allocated object can be shared between multiple owner and will only be released after all the owner are destroyed.
+    - `std::shared_ptr<T>` uses reference counting to keep track of how many owners are owning the heap allocated object. Once, the count hits 0 the heap allocated object will be deleted.
+    - `std::shared_ptr<T>` object can be copied, but will increase the ref count by one.
+    - The ownership can be moved to another object. but will not increase the ref count.
+    ```cpp
+    std::shared_ptr<Base> sharedOwner1 = std::make_shared<Base>(argumentForBaseConstructor); //std::make_shared() create an object of typ Base on heap and then will return std::shared_ptr object as the owner of that object. Red count will be 1.
+    std::shared_ptr<Base> sharedOwner2 = sharedOwnerOwner1; //OK: Ownership can be copied/taken by multiple owner. Now ref count - 2
+    std::shared_ptr<Base> sharedOwner3 = std::move(sharedOwner1);//OK: ownership can be moved from  sharedOwner1 to sharedOwner3. Which leaves sharedOwner1 in hallow state and should not be used further in code. hence, ref count is still 2.
+    ```
+
+* #### `std::weak_ptr<T>`
+    - `std::weak_ptr<T>` does not take any kind of ownership of any object. it only observes/reference `std::shared_ptr<T>` without incrementing the ref count.
+    - `std::weak_ptr<T>` can be copied or moved without ref count increment or decrement.
+    ```cpp
+    std::shared_ptr<Base> sharedOwner1 = std::make_shared<Base>(argumentForBaseConstructor); //ref count - 1
+    std::weak_ptr<Base> weak1 = sharedOwner1; //ref count - 1
+    std::weak_ptr<Base> weak2 = weak1; //ref count - 1
+    std::weak_ptr<Base> weak3 = std::move(weak2);//ref count - 1
+    ```
+    - How to check if the shared object being observed is still alive?
+    ```cpp
+    std::shared_ptr<Base> newShared = weak1.lock();
+    if(newShared){ /*Heap allocated object Still alive.*/ } 
+    else{ /*Heap allocated object is deleted.*/ } 
+    ```
+
+## Multi-Threading
+- Inside a main process, multiple task can be performed simultaneously.
+- A single large task can be broken down into smaller independent tasks and can be run simultaneously and their result can be combined as the output of larger task.
+- The power of multi-core CPU can be leveraged suing multi-threading to a large complete task faster.
+
+* ### Thread creation:
+    ```cpp
+    #include<thread>
+
+    void funcName(int parameter1)
+    {
+        //Some processing.
+    }
+
+    int parameter1 = 100;
+    std::thread th1(funcName, parameter1); //Thread gets created and starts executing the passed function with given parameter value independently.
+    int parameter2 = 100;
+    std::thread th2(funcName, parameter2); //2nd Thread gets created and starts executing the same passed function with some different given parameter value independently.
+
+    th1.detach(); //th1 will be detached and will complete it's task. We will not track.
+    th2.join();//Wait for thread 1 to complete task and join.
+    ```
+    * ### `std::thread::joinable()` function:
+        returns `false`:
+        - If thread is empty and has nothing given to execute.
+        - Is already been joined or detached.
+        - Or moved to another object.
+        ```cpp
+        std::thread th1();//Empty thread
+        bool isJoinable = the1.joinable();//Return false because thread is empty.
+        
+        std::thread th2(funcName, parameter1); //Non-Empty thread. Has been given something to execute.
+        if(th2.joinable())//Returns true. Because th2 is not empty and can join back.
+            th2.join();//wait for it to join.
+        
+        bool isJoinable = th2.joinable();//Returns false. Because th2 has already joined just above.
+
+        std::thread th3(funcName, parameter1);
+        std::thread th4 = std::move(th3);//Moved thread from th3 to th4
+        bool isJoinable = th3.joinable();//Returns false. Because thread moved to another object.
+        th4.detach();
+        bool isJoinable = th4.joinable();//Returns false. Because, th4 has been detached and can no longer join back.
+        ```
+* ### Race Condition and Data Race:
+    - When more than one concurrent thread access and modify the same shared data concurrently and depending on the order in which they access the data the final outcome differs. is called **Race Condition**.
+    - When two or more thread access the same memory simultaneously and one of them changes the data in memory is called **Data Race**.
+    - To solve this issue, we use  **Mutual Exclusion or Mutex** thread synchronization mechanism.`
+
+    * ### class `std::mutex` locking mechanism:
+        ```cpp
+        #include <thread>
+        #include <mutex>
+        int shared_data = 10;
+        std::mutex x;
+
+        void funcName()
+        {
+            //Some code...
+            std::unique_lock<std::mutex> lock(x);//Create a lock.
+            lock.lock();//lock the section of code and let the locking thread go ahead and let others wait for it to release.
+            if((shared_data % 2) == 0)//If even add 3
+                shared_data = shared_data + 3;
+            else //If odd add 2
+                shared_data = shared_data + 2;
+            lock.unlock();//Unlock the section of code and let any other single thread to lock the same section and use it.
+            //Some more code...
+        }
+        ```
+    * ### `class std::lock_guard<std::mutex>` and `class std::unique_lock<std::mutex>` uses:
+        ```cpp
+        std::mutex x;
+        void funName()
+        {
+         {
+            std::lock_guard<std::mutex> lock1(x);//Simultaneously create the lock and lock the below section of code upto next scope end.
+            //Some code...
+            //Some more code...
+         }//As lock1 scope ends automatically unlock above section of code.
+
+         std::unique_lock<std::mutex> lock2(x);//Just create the lock.
+         lock2.lock(); //Explicitly lock the below section of code.
+         //Some code...
+         lock2.unlock(); //Explicitly unlock the above section of code.
+        }
+
+        ```
