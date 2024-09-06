@@ -24,13 +24,13 @@
 
 * ### Calculate vector from point A to point B
 
-    ```math
-        \vec{AB}=(X_{B} - X_{A})i + (Y_{B} - Y_{A})j + (Z_{B} - Z_{A})k
-    ```
+```math
+\vec{AB}=(X_{B} - X_{A})i + (Y_{B} - Y_{A})j + (Z_{B} - Z_{A})k
+```
 
 * ### Dot product of two vectors A and B
 
-    Let $ \vec{A} $ and $` \vec{B} `$ be our two vectors.
+    Let $` \vec{A} `$ and $` \vec{B} `$ be our two vectors.
 
     >Dot product of two vectors returns a scalar i.e a number.
 
