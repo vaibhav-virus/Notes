@@ -18,9 +18,9 @@
 
 * ### Calculate distance between points A and B
 
-    ```math
-        |\overline{AB}|= Distance = \sqrt{(X_{B} - X_{A})^{2} + (Y_{B} - Y_{A})^{2} + (Z_{B} - Z_{A})^{2}}
-    ```
+```math
+|\overline{AB}|= Distance = \sqrt{(X_{B} - X_{A})^{2} + (Y_{B} - Y_{A})^{2} + (Z_{B} - Z_{A})^{2}}
+```
 
 * ### Calculate vector from point A to point B
 
@@ -52,7 +52,7 @@
 
 * ### Approach 1
 
-        Distance AB = Distance AP + Distance PB
+    Distance AB = Distance AP + Distance PB
 
     Click on image to play.
     [![IMAGE ALT TEXT HERE](https://i.ytimg.com/vi/rOoPLrGnizY/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDb8G9QaPU-PGW3uGSBAyMNeHxnQw)](https://youtu.be/rOoPLrGnizY?si=pi2m3fnxqjqahNw5&t=74)
