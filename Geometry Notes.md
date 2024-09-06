@@ -2,27 +2,35 @@
 
 ## Common Assumptions
 
-$$` A = (X_{A} , Y_{A}, Z_{A}) `$$
-$$` B = (X_{B} , Y_{B}, Z_{B}) `$$
-$$` C = (X_{C} , Y_{C}, Z_{C}) `$$
+```math
+     A = (X_{A} , Y_{A}, Z_{A}) 
+```
+
+```math
+    B = (X_{B} , Y_{B}, Z_{B})
+```
+
+```math
+    C = (X_{C} , Y_{C}, Z_{C})
+```
 
 ## Geometry basics
 
 * ### Calculate distance between points A and B
 
-    $$`
+    ```math
         |\overline{AB}|= Distance = \sqrt{(X_{B} - X_{A})^{2} + (Y_{B} - Y_{A})^{2} + (Z_{B} - Z_{A})^{2}}
-    $$`
+    ```
 
 * ### Calculate vector from point A to point B
 
-    $$`
+    ```math
         \vec{AB}=(X_{B} - X_{A})i + (Y_{B} - Y_{A})j + (Z_{B} - Z_{A})k
-    $$`
+    ```
 
 * ### Dot product of two vectors A and B
 
-    Let $` \vec{A} `$ and $` \vec{B} `$ be our two vectors.
+    Let $ \vec{A} $ and $` \vec{B} `$ be our two vectors.
 
     >Dot product of two vectors returns a scalar i.e a number.
 
