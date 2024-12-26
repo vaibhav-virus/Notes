@@ -169,4 +169,50 @@ void loop() {
 4. **Use Timer Libraries**:
    - For complex applications, libraries like `TimerOne` simplify timer usage.
 
-By mastering these concepts and examples, you'll be able to leverage Arduino Uno's timers for efficient and precise control in your projects.
+### Using all timer interrupts
+```cpp
+static uint8_t b_count = 0;    // Counter for Compare Match B
+static uint8_t overflow_count = 0; // Counter for Timer Overflow
+// Compare Match A interrupt service routine
+ISR(TIMER0_COMPA_vect) {
+    PORTB ^= (1 << PB0); // Toggle LED1 (PB0) every 100ms
+}
+
+// Compare Match B interrupt service routine
+ISR(TIMER0_COMPB_vect) {
+    b_count++;
+    if (b_count >= 2) { // 2 matches (200ms) for approximately 250ms
+        PORTB ^= (1 << PB1); // Toggle LED2 (PB1)
+        b_count = 0;         // Reset counter
+    }
+}
+
+// Timer Overflow interrupt service routine
+ISR(TIMER0_OVF_vect) {
+    overflow_count++;
+    if (overflow_count >= 62) { // Approximately 16ms * 62 = 1 second
+        PORTB ^= (1 << PB2); // Toggle LED3 (PB2)
+        overflow_count = 0;  // Reset counter
+    }
+}
+
+void setup(void) {
+    // Configure PB0, PB1, and PB2 as output (for LEDs)
+    DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
+
+    // Configure Timer0 in CTC mode
+    TCCR0A = (1 << WGM01);               // Enable CTC mode (WGM01 = 1, WGM00 = 0)
+    TCCR0B = (1 << CS01) | (1 << CS00);  // Set prescaler to 64
+
+    // Set Compare Match values
+    OCR0A = 249; // Compare Match A for 100ms
+    OCR0B = 249; // Compare Match B for 100ms (to be counted for 250ms)
+
+    // Enable interrupts for all Timer0 types
+    TIMSK0 = (1 << OCIE0A) | (1 << OCIE0B) | (1 << TOIE0); // Enable Compare A, Compare B, and Overflow interrupts
+
+    sei(); // Enable global interrupts
+}
+
+void loop(){}
+```
